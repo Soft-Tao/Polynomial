@@ -19,31 +19,31 @@ PNode Add (int *pa, int *pb)
     int aexp, bexp, nexp,i,j;
     p = (PNode)malloc(sizeof(struct Node));
     pAdd = p;
-    aexp = *(pa + 1);
+    aexp = *(pa + 1);//取数组的第二个值，为多项式首项的次数
     bexp = *(pb + 1);
-    nexp = (aexp>bexp)?aexp:bexp;
-    for (i=nexp;i>=0;i--)
+    nexp = (aexp>bexp)?aexp:bexp;//deg (f(x) + g(x)) <= max {degf(x), deg g(x)}
+    for (i=nexp;i>=0;i--)//初始化链表
     {
-        q = (PNode)malloc(sizeof(struct Node));
+        q = (PNode)malloc(sizeof(struct Node)); 
         p->link = q;
         p = q;
         p->exp = i;
         p->coef = 0;
     }
     p = pAdd;
-    for (i=0;i<=nexp;i++)
+    for (i=0;i<=nexp;i++)//把指数符合的项对应的系数加到链表里面
     {
         p = p->link;
         for (j=1;;j+=2)
         {
             if (*(pa+j)==0 && *(pa+j-1) ==0)
             {
-                break;
+                break;//读取到数组的末尾了
             }
             if (*(pa + j) == p->exp)
             {
                 p ->coef += *(pa+j-1);
-                break;
+                break;//匹配到了之后，后面的一定都不满足，因为是降幂排列
             }
         }
         for (j=1;;j+=2)
@@ -59,7 +59,7 @@ PNode Add (int *pa, int *pb)
             }
         }
     }
-    return pAdd;
+    return pAdd;//和用链表表示，返回该链表的指针
 }
 
 PNode Multiply (int *pa, int *pb)
@@ -70,8 +70,8 @@ PNode Multiply (int *pa, int *pb)
     pMutiply = p;
     aexp = *(pa+1);
     bexp = *(pb+1);
-    nexp = aexp+bexp;
-    for (i=nexp;i>=0;i--)
+    nexp = aexp+bexp;//deg(f(x)*g(x)) = deg f(x) + deg(x)
+    for (i=nexp;i>=0;i--)//初始化
     {
         q = (PNode)malloc(sizeof(struct Node));
         p->link = q;
@@ -85,7 +85,7 @@ PNode Multiply (int *pa, int *pb)
         p = p->link;
         for (j=1;;j+=2)
         {
-            if (*(pa + j)==0 && *(pa + j - 1)==0)
+            if (*(pa + j)==0 && *(pa + j - 1)==0)//遍历两个数组，查找满足的所有组合
             {
                 break;
             }
@@ -106,22 +106,22 @@ PNode Multiply (int *pa, int *pb)
     return pMutiply;
 }
 
-void Write (PLinkList plist)
+void Write (PLinkList plist)//格式化输出多项式
 {
     PNode p;
     p = *plist;
     p = p->link;
-    while (p->coef == 0)
+    while (p->coef == 0)//先找到系数不为零的第一个元素
     {
         p = p->link;
     }
-    if (p->exp == 0)
+    if (p->exp == 0)//如果是最后一个
     {
-        if (p->coef == 0)
+        if (p->coef == 0)//是最后一个而且系数为零
         {
             printf ("0\n");
         }
-        else
+        else//是最后一个系数不为零
         {
             printf ("%d\n", p->coef);
         }
@@ -129,85 +129,85 @@ void Write (PLinkList plist)
     else 
     {
         //printf ("%dx^%d", p->coef, p->exp);
-        if (p->coef == 1)
+        if (p->coef == 1)//系数为1 
         {
-            if (p->exp == 1)
+            if (p->exp == 1)//系数为一而且指数为一
             {
                 printf ("x");
             }
             else
             {
-                printf ("x^%d", p->exp);  
+                printf ("x^%d", p->exp);  //系数为一但指数不为一
             }
             //printf ("x^%d", p->exp);
         }
-        else if (p->coef == -1)
+        else if (p->coef == -1)//系数为-1
         {
-            if (p->exp == 1)
+            if (p->exp == 1)//系数为-1而且指数为1
             {
                 printf ("-x");
             }
             else
             {
-                printf ("-x^%d", p->exp);
+                printf ("-x^%d", p->exp);//系数为-1而且指数不为一
             }
             //printf ("-x^%d", p->exp);
         }
-        else
+        else//系数既不是1，也不是-1
         {
-            if (p->exp == 1)
+            if (p->exp == 1)//系数既不是1也不是-1而且指数为1
             {
                 printf ("%dx", p->coef);
             }
-            else 
+            else //系数既不是1也不是-1而且指数不为1
             {
                 printf ("%dx^%d", p->coef, p->exp);
             }
             //printf ("%dx^%d", p->coef, p->exp);
         }
-        p = p->link;
-        if (p->exp == 0)
+        p = p->link;//移到下一位
+        if (p->exp == 0)//如果下一位是最后一位
         {
-            if (p->coef > 0)
+            if (p->coef > 0)//系数dayu0
             {
                 printf ("+%d\n", p->coef);
             }
-            if (p->coef < 0)
+            if (p->coef < 0)//系数小于0
             {
                 printf ("%d\n", p->coef);
             }
         }
-        else
+        else//如果不是最后一位
         {
-            while (p->exp != 0)
+            while (p->exp != 0)//当移到最后一位前
             {
-                while(p->coef == 0)
+                while(p->coef == 0)//找到下一个系数不是零的
                 {
                     p = p->link;
                 }
-                if (p->exp != 0)
+                if (p->exp != 0)//如果这个不是最后一个
                 {
-                    if (p->coef > 0)
+                    if (p->coef > 0)//系数不是零，不是最后一个，且系数大于0
                     {
-                        if (p->coef == 1)
+                        if (p->coef == 1)//系数不是0.不是最后一个，系数大于0，而且系数为1
                         {
-                            if (p->exp == 1)
+                            if (p->exp == 1)//系数不是0.不是最后一个，系数大于0，而且系数为1，而且指数为一
                             {
                                 printf ("+x");
                             }
-                            else 
+                            else //系数不是0.不是最后一个，系数大于0，而且系数为1，且指数不为一
                             {
                                printf ("+x^%d", p->exp);
                             }
                             //printf ("+x^%d", p->exp);
                         }
-                        else
+                        else//系数不是零，不是最后一个，系数大于0 而且不是1
                         {
-                            if (p->exp == 1)
+                            if (p->exp == 1)//系数不是零，不是最后一个，系数大于0 而且不是1，而且指数是1
                             {
                                 printf ("+%dx", p->coef);
                             }
-                            else
+                            else//系数不是零，不是最后一个，系数大于0 而且不是1，指数不是1
                             {
                                 printf ("+%dx^%d", p->coef, p->exp);
                             }
@@ -215,7 +215,7 @@ void Write (PLinkList plist)
                         }
                         //printf ("+%dx^%d", p->coef, p->exp);
                     }
-                    if (p->coef < 0)
+                    if (p->coef < 0)//
                     {
                         if (p->coef == -1)
                         {
